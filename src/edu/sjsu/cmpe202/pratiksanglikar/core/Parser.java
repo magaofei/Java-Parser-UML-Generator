@@ -8,24 +8,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import com.github.javaparser.ast.CompilationUnit;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.Edge;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.EdgeType;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.Node;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.PackageStructure;
 import edu.sjsu.cmpe202.pratiksanglikar.utilities.FileHandler;
-import japa.parser.JavaParser;
-import japa.parser.ast.CompilationUnit;
-import japa.parser.ast.body.BodyDeclaration;
-import japa.parser.ast.body.ClassOrInterfaceDeclaration;
-import japa.parser.ast.body.ConstructorDeclaration;
-import japa.parser.ast.body.FieldDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.body.Parameter;
-import japa.parser.ast.body.TypeDeclaration;
-import japa.parser.ast.type.ClassOrInterfaceType;
-import japa.parser.ast.type.PrimitiveType;
-import japa.parser.ast.type.ReferenceType;
-import japa.parser.ast.type.Type;
+import com.github.javaparser.JavaParser;
+import com.github.javaparser.ast.CompilationUnit;
+import com.github.javaparser.ast.body.BodyDeclaration;
+import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.TypeDeclaration;
+import com.github.javaparser.ast.type.ClassOrInterfaceType;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.type.Type;
 
 /**
  * This class handles all the parsing part of Java Code Parser.
@@ -82,8 +83,14 @@ public class Parser {
 						if (implementsList != null) {
 							for (BodyDeclaration classMember : classMembers) {
 								for (ClassOrInterfaceType interfaceN : implementsList) {
-									List<MethodDeclaration> interfaceMembers = packageStructure
-											.getNodeByName(interfaceN.getName()).getMethods();
+									Node node = packageStructure.getNodeByName(interfaceN.getName());
+
+									// 接口 不在 该包里
+									if (node == null) {
+										continue;
+									}
+									List<MethodDeclaration> interfaceMembers = node.getMethods();
+
 									for (MethodDeclaration interfaceMethod : interfaceMembers) {
 										if (interfaceMethod.getName()
 												.equals(((MethodDeclaration) classMember).getName())) {
@@ -195,6 +202,11 @@ public class Parser {
 					for (Parameter parameter : parameters) {
 						if (isReferenceType(parameter.getType())) {
 							Node refNode = packageStructure.getNodeByName(parameter.getType().toString());
+
+							// 不在当前包里
+							if (refNode == null) {
+								continue;
+							}
 							if (!typeDeclaration.isInterface() && refNode.isInterface()) {
 								if (packageStructure.getEdge(typeDeclaration.getName(), refNode.getTypeName(),
 										EdgeType.ASSOCIATION) == null) {
@@ -226,6 +238,9 @@ public class Parser {
 					for (Parameter parameter : parameters) {
 						if (isReferenceType(parameter.getType())) {
 							Node refNode = packageStructure.getNodeByName(parameter.getType().toString());
+							if (refNode == null) {
+								continue;
+							}
 							if (!typeDeclaration.isInterface() && refNode.isInterface()) {
 								if (packageStructure.getEdge(typeDeclaration.getName(), refNode.getTypeName(),
 										EdgeType.ASSOCIATION) == null) {
@@ -255,6 +270,9 @@ public class Parser {
 			destinationTypeName = destinationTypeName.replace(">", "");
 		}
 		Node destination = packageStructure.getNodeByName(destinationTypeName);
+		if (destination == null) {
+			return;
+		}
 		Edge edge = packageStructure.getEdge(destinationTypeName, source.getTypeName(), EdgeType.COMPOSITON);
 		if (edge != null) {
 			if (edge.getDestCardinality().equals("")) {

@@ -67,6 +67,9 @@ public class PackageStructure {
 	 */
 	public Edge getEdge(String source, String destination, EdgeType edgeType){
 		for (Edge edge : edges) {
+			if (edge.getDestination() == null) {
+				continue;
+			}
 			if(edge.getSource().getTypeName().equals(source) &&
 					(edge.getDestination().getTypeName().equals(destination)) &&
 					edge.getEdgeType().equals(edgeType)){

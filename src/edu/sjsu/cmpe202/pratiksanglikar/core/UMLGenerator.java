@@ -10,15 +10,18 @@ import edu.sjsu.cmpe202.pratiksanglikar.beans.Edge;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.EdgeType;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.Node;
 import edu.sjsu.cmpe202.pratiksanglikar.beans.PackageStructure;
-import japa.parser.ast.body.ConstructorDeclaration;
-import japa.parser.ast.body.FieldDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
-import japa.parser.ast.body.Parameter;
-import japa.parser.ast.body.VariableDeclarator;
-import japa.parser.ast.type.PrimitiveType;
-import japa.parser.ast.type.ReferenceType;
-import japa.parser.ast.type.Type;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.Parameter;
+import com.github.javaparser.ast.body.VariableDeclarator;
+import com.github.javaparser.ast.type.PrimitiveType;
+import com.github.javaparser.ast.type.ReferenceType;
+import com.github.javaparser.ast.type.Type;
 import net.sourceforge.plantuml.SourceStringReader;
+
+import javax.security.auth.login.CredentialNotFoundException;
+
 /**
  * generates UML diagram for given packageStructure.
  * @author pratiksanglikar
@@ -41,9 +44,13 @@ public class UMLGenerator {
 		}
 		List<Edge> edges = packageStructure.getEdges();
 		for (Edge edge: edges ){
+			if (edge == null) {
+				continue;
+			}
 			umlString += generateEdgeString(edge);
 		}
 		umlString += "\n@enduml";
+		System.out.println(umlString);
 		generateDiagram(umlString, fileName);
 	}
 
@@ -55,6 +62,9 @@ public class UMLGenerator {
 	private String generateEdgeString(Edge edge) {
 		String edgeString = "";
 		String sourceName = edge.getSource().getTypeName();
+		if (edge.getDestination() == null) {
+			return "";
+		}
 		String destinationName = edge.getDestination().getTypeName();
 		String edgeType = getEdgeType(edge.getEdgeType());
 		if(edge.getEdgeType().equals(EdgeType.COMPOSITON)){

@@ -3,9 +3,9 @@ package edu.sjsu.cmpe202.pratiksanglikar.beans;
 import java.util.ArrayList;
 import java.util.List;
 
-import japa.parser.ast.body.ConstructorDeclaration;
-import japa.parser.ast.body.FieldDeclaration;
-import japa.parser.ast.body.MethodDeclaration;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
+import com.github.javaparser.ast.body.FieldDeclaration;
+import com.github.javaparser.ast.body.MethodDeclaration;
 
 /**
  * This class represents one Class of the Java source code. 
